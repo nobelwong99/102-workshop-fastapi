@@ -8,8 +8,11 @@ Author: Nobel Wong - TM Technology
 Date: 2025-08-21
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status, Query
 from pydantic import BaseModel
+from typing import Optional
+
+TASK_NOT_FOUND_MESSAGE = "Task not found"
 
 
 class Task(BaseModel):
@@ -61,7 +64,7 @@ tasks = [
 ]
 
 
-@app.get("/")
+@app.get("/", status_code=status.HTTP_200_OK)
 def read_root():
     """
     Root endpoint that returns a welcome message.
@@ -72,18 +75,35 @@ def read_root():
     return {"message": "Hello World"}
 
 
-@app.get("/tasks")
-def read_tasks():
+@app.get("/tasks", status_code=status.HTTP_200_OK)
+def read_tasks(
+    completed: Optional[bool] = Query(
+        None, description="Filter tasks by completion status"
+    ),
+):
     """
-    Retrieve all tasks.
+    Retrieve all tasks with optional filtering.
+
+    Args:
+        completed (Optional[bool]): Filter tasks by completion status.
+                                  If None, returns all tasks.
 
     Returns:
-        dict: Dictionary containing all tasks
+        dict: Dictionary containing filtered tasks
     """
-    return {"tasks": tasks}
+    # Start with all tasks
+    filtered_tasks = tasks.copy()
+
+    # Filter by completion status if specified
+    if completed is not None:
+        filtered_tasks = [
+            task for task in filtered_tasks if task["completed"] == completed
+        ]
+
+    return {"tasks": filtered_tasks}
 
 
-@app.get("/tasks/{task_id}")
+@app.get("/tasks/{task_id}", status_code=status.HTTP_200_OK)
 def read_task(task_id: int):
     """
     Retrieve a specific task by its ID.
@@ -92,34 +112,62 @@ def read_task(task_id: int):
         task_id (int): The unique identifier of the task
 
     Returns:
-        dict: Task data if found, or error message if not found
+        dict: Task data if found
+
+    Raises:
+        HTTPException: 404 if task not found
     """
     # Search for task with matching ID
     for task in tasks:
         if task["id"] == task_id:
             return {"message": "Task found", "task": task}
 
-    # Return error if task not found
-    return {"message": "Task not found"}
+    # Raise HTTP 404 exception if task not found
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=TASK_NOT_FOUND_MESSAGE
+    )
 
 
-@app.post("/tasks")
-def create_task(task: Task):
+@app.post("/tasks", status_code=status.HTTP_201_CREATED)
+def create_task(
+    task: Task,
+    auto_id: bool = Query(False, description="Automatically generate task ID"),
+):
     """
     Create a new task.
 
     Args:
         task (Task): Task object containing task details
+                auto_id (bool): If True, automatically generates a unique ID,
+                       ignoring the ID in the request body
 
     Returns:
         dict: Confirmation message and created task data
+
+    Raises:
+        HTTPException: 400 if task with same ID already exists
+                       (when auto_id=False)
     """
+    # Handle auto ID generation
+    if auto_id:
+        # Generate new ID (find max ID and add 1)
+        max_id = max([t["id"] for t in tasks], default=0)
+        task.id = max_id + 1
+    else:
+        # Check if task with same ID already exists
+        for existing_task in tasks:
+            if existing_task["id"] == task.id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Task with ID {task.id} already exists",
+                )
+
     # Convert Pydantic model to dictionary and add to tasks list
     tasks.append(task.model_dump())
     return {"message": "Task created", "task": task}
 
 
-@app.put("/tasks/{task_id}")
+@app.put("/tasks/{task_id}", status_code=status.HTTP_200_OK)
 def update_task(task_id: int, updated_task: Task):
     """
     Update an existing task by its ID.
@@ -129,21 +177,38 @@ def update_task(task_id: int, updated_task: Task):
         updated_task (Task): Updated task data
 
     Returns:
-        dict: Confirmation message and updated task data, or error if not found
+        dict: Confirmation message and updated task data
+
+    Raises:
+        HTTPException: 404 if task not found
+        HTTPException: 400 if trying to change task ID to existing ID
     """
+    # Check if trying to change ID to an existing one
+    # (but not the current task)
+    if updated_task.id != task_id:
+        for task in tasks:
+            if task["id"] == updated_task.id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Task with ID {updated_task.id} already exists",
+                )
+
     # Search for task with matching ID and update its fields
     for task in tasks:
         if task["id"] == task_id:
+            task["id"] = updated_task.id
             task["title"] = updated_task.title
             task["description"] = updated_task.description
             task["completed"] = updated_task.completed
             return {"message": "Task updated", "task": task}
 
-    # Return error if task not found
-    return {"message": "Task not found"}
+    # Raise HTTP 404 exception if task not found
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=TASK_NOT_FOUND_MESSAGE
+    )
 
 
-@app.delete("/tasks/{task_id}")
+@app.delete("/tasks/{task_id}", status_code=status.HTTP_200_OK)
 def delete_task(task_id: int):
     """
     Delete a task by its ID.
@@ -152,7 +217,10 @@ def delete_task(task_id: int):
         task_id (int): The unique identifier of the task to delete
 
     Returns:
-        dict: Confirmation message and deleted task data, or error if not found
+        dict: Confirmation message and deleted task data
+
+    Raises:
+        HTTPException: 404 if task not found
     """
     # Search for task with matching ID and remove it
     for task in tasks:
@@ -160,5 +228,7 @@ def delete_task(task_id: int):
             tasks.remove(task)
             return {"message": "Task deleted", "task": task}
 
-    # Return error if task not found
-    return {"message": "Task not found"}
+    # Raise HTTP 404 exception if task not found
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=TASK_NOT_FOUND_MESSAGE
+    )
