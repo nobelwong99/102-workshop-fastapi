@@ -11,8 +11,11 @@ Date: 2025-08-21
 from fastapi import FastAPI, HTTPException, status, Query
 from pydantic import BaseModel
 from typing import Optional
+import json
+import os
 
 TASK_NOT_FOUND_MESSAGE = "Task not found"
+DATA_FILE = "data.json"
 
 
 class Task(BaseModel):
@@ -40,28 +43,27 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# In-memory storage for tasks
-# (in production, use a proper database)
-tasks = [
-    {
-        "id": 1,
-        "title": "Task 1",
-        "description": "Task 1 description",
-        "completed": False,
-    },
-    {
-        "id": 2,
-        "title": "Task 2",
-        "description": "Task 2 description",
-        "completed": False,
-    },
-    {
-        "id": 3,
-        "title": "Task 3",
-        "description": "Task 3 description",
-        "completed": False,
-    },
-]
+
+# Load tasks from JSON file
+def load_data_from_json():
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r") as f:
+                return json.load(f)
+        else:
+            return []
+    except Exception as e:
+        print(f"Error reading data from JSON file: {e}")
+        return []
+
+
+# Save tasks to JSON file
+def save_data_to_json(data):
+    try:
+        with open(DATA_FILE, "w") as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print(f"Error saving data to JSON file: {e}")
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
@@ -91,6 +93,9 @@ def read_tasks(
     Returns:
         dict: Dictionary containing filtered tasks
     """
+    # Load tasks from JSON file
+    tasks = load_data_from_json()
+
     # Start with all tasks
     filtered_tasks = tasks.copy()
 
@@ -117,6 +122,9 @@ def read_task(task_id: int):
     Raises:
         HTTPException: 404 if task not found
     """
+    # Load tasks from JSON file
+    tasks = load_data_from_json()
+
     # Search for task with matching ID
     for task in tasks:
         if task["id"] == task_id:
@@ -148,6 +156,9 @@ def create_task(
         HTTPException: 400 if task with same ID already exists
                        (when auto_id=False)
     """
+    # Load tasks from JSON file
+    tasks = load_data_from_json()
+
     # Handle auto ID generation
     if auto_id:
         # Generate new ID (find max ID and add 1)
@@ -164,6 +175,10 @@ def create_task(
 
     # Convert Pydantic model to dictionary and add to tasks list
     tasks.append(task.model_dump())
+
+    # Save updated tasks back to JSON file
+    save_data_to_json(tasks)
+
     return {"message": "Task created", "task": task}
 
 
@@ -183,6 +198,9 @@ def update_task(task_id: int, updated_task: Task):
         HTTPException: 404 if task not found
         HTTPException: 400 if trying to change task ID to existing ID
     """
+    # Load tasks from JSON file
+    tasks = load_data_from_json()
+
     # Check if trying to change ID to an existing one
     # (but not the current task)
     if updated_task.id != task_id:
@@ -200,6 +218,10 @@ def update_task(task_id: int, updated_task: Task):
             task["title"] = updated_task.title
             task["description"] = updated_task.description
             task["completed"] = updated_task.completed
+
+            # Save updated tasks back to JSON file
+            save_data_to_json(tasks)
+
             return {"message": "Task updated", "task": task}
 
     # Raise HTTP 404 exception if task not found
@@ -222,10 +244,17 @@ def delete_task(task_id: int):
     Raises:
         HTTPException: 404 if task not found
     """
+    # Load tasks from JSON file
+    tasks = load_data_from_json()
+
     # Search for task with matching ID and remove it
     for task in tasks:
         if task["id"] == task_id:
             tasks.remove(task)
+
+            # Save updated tasks back to JSON file
+            save_data_to_json(tasks)
+
             return {"message": "Task deleted", "task": task}
 
     # Raise HTTP 404 exception if task not found
