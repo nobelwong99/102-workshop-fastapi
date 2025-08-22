@@ -60,7 +60,7 @@ def test_api():
     except requests.exceptions.ConnectionError:
         print("❌ Error: Could not connect to the API server.")
         print("   Make sure the server is running with:")
-        print("   uvicorn main:app --reload")
+        print("   fastapi dev main.py")
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
 
