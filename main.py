@@ -9,6 +9,7 @@ Date: 2025-08-21
 """
 
 from fastapi import FastAPI, HTTPException, status, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import json
@@ -41,6 +42,15 @@ app = FastAPI(
     title="Task Management API",
     description="A simple API for managing tasks",
     version="1.0.0",
+)
+
+# Add CORS middleware to allow frontend access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 
