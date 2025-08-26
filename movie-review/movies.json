@@ -1,0 +1,57 @@
+[
+    {
+        "id": 1,
+        "title": "The Matrix",
+        "description": "A computer programmer discovers that reality as he knows it is a simulation controlled by machines.",
+        "genre": "science_fiction",
+        "release_year": 1999,
+        "director": "The Wachowskis",
+        "duration_minutes": 136,
+        "rating": null,
+        "review_count": 0
+    },
+    {
+        "id": 2,
+        "title": "Inception",
+        "description": "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into a CEO's mind.",
+        "genre": "science_fiction",
+        "release_year": 2010,
+        "director": "Christopher Nolan",
+        "duration_minutes": 148,
+        "rating": 9.9,
+        "review_count": 2
+    },
+    {
+        "id": 3,
+        "title": "The Godfather",
+        "description": "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+        "genre": "drama",
+        "release_year": 1972,
+        "director": "Francis Ford Coppola",
+        "duration_minutes": 175,
+        "rating": null,
+        "review_count": 0
+    },
+    {
+        "title": "Title",
+        "description": "Movie description",
+        "genre": "action",
+        "release_year": 2024,
+        "director": "Director",
+        "duration_minutes": 180,
+        "id": 4,
+        "rating": 9.3,
+        "review_count": 1
+    },
+    {
+        "title": "Movie Title",
+        "description": "Movie description",
+        "genre": "comedy",
+        "release_year": 2024,
+        "director": "Director",
+        "duration_minutes": 180,
+        "id": 5,
+        "rating": 9.5,
+        "review_count": 1
+    }
+]

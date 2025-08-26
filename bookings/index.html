@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Hotel Booking Management</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				min-height: 100vh;
+				color: #333;
+			}
+
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+
+			.header {
+				text-align: center;
+				margin-bottom: 40px;
+				color: white;
+			}
+
+			.header h1 {
+				font-size: 2.5rem;
+				margin-bottom: 10px;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+			}
+
+			.header p {
+				font-size: 1.1rem;
+				opacity: 0.9;
+			}
+
+			.tab-container {
+				background: white;
+				border-radius: 15px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+				overflow: hidden;
+				margin-bottom: 20px;
+			}
+
+			.tabs {
+				display: flex;
+				background: #f8f9fa;
+				border-bottom: 1px solid #e9ecef;
+			}
+
+			.tab {
+				flex: 1;
+				padding: 20px;
+				text-align: center;
+				cursor: pointer;
+				font-weight: 600;
+				transition: all 0.3s ease;
+				border: none;
+				background: none;
+				font-size: 1rem;
+			}
+
+			.tab:hover {
+				background: #e9ecef;
+			}
+
+			.tab.active {
+				background: #667eea;
+				color: white;
+			}
+
+			.tab-content {
+				padding: 30px;
+				display: none;
+			}
+
+			.tab-content.active {
+				display: block;
+			}
+
+			.form-group {
+				margin-bottom: 20px;
+			}
+
+			.form-row {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 15px;
+				margin-bottom: 20px;
+			}
+
+			label {
+				display: block;
+				margin-bottom: 5px;
+				font-weight: 600;
+				color: #555;
+			}
+
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 12px;
+				border: 2px solid #e9ecef;
+				border-radius: 8px;
+				font-size: 1rem;
+				transition: border-color 0.3s ease;
+			}
+
+			input:focus,
+			select:focus,
+			textarea:focus {
+				outline: none;
+				border-color: #667eea;
+			}
+
+			textarea {
+				resize: vertical;
+				min-height: 80px;
+			}
+
+			.btn {
+				padding: 12px 24px;
+				border: none;
+				border-radius: 8px;
+				font-size: 1rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				margin-right: 10px;
+				margin-bottom: 10px;
+			}
+
+			.btn-primary {
+				background: #667eea;
+				color: white;
+			}
+
+			.btn-primary:hover {
+				background: #5a6fd8;
+				transform: translateY(-2px);
+			}
+
+			.btn-secondary {
+				background: #6c757d;
+				color: white;
+			}
+
+			.btn-secondary:hover {
+				background: #5a6268;
+			}
+
+			.btn-danger {
+				background: #dc3545;
+				color: white;
+			}
+
+			.btn-danger:hover {
+				background: #c82333;
+			}
+
+			.btn-success {
+				background: #28a745;
+				color: white;
+			}
+
+			.btn-success:hover {
+				background: #218838;
+			}
+
+			.card {
+				background: white;
+				border-radius: 10px;
+				padding: 20px;
+				margin-bottom: 20px;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+				border: 1px solid #e9ecef;
+			}
+
+			.card-header {
+				font-size: 1.2rem;
+				font-weight: 600;
+				margin-bottom: 15px;
+				color: #333;
+				border-bottom: 2px solid #f8f9fa;
+				padding-bottom: 10px;
+			}
+
+			.room-card,
+			.booking-card {
+				background: #f8f9fa;
+				border-radius: 8px;
+				padding: 15px;
+				margin-bottom: 15px;
+				border-left: 4px solid #667eea;
+			}
+
+			.room-card h4,
+			.booking-card h4 {
+				color: #333;
+				margin-bottom: 10px;
+			}
+
+			.room-details,
+			.booking-details {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+				gap: 10px;
+				margin-bottom: 15px;
+			}
+
+			.detail-item {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.detail-label {
+				font-size: 0.85rem;
+				color: #666;
+				font-weight: 600;
+				margin-bottom: 2px;
+			}
+
+			.detail-value {
+				font-size: 1rem;
+				color: #333;
+			}
+
+			.status-badge {
+				display: inline-block;
+				padding: 4px 12px;
+				border-radius: 20px;
+				font-size: 0.85rem;
+				font-weight: 600;
+				text-transform: uppercase;
+			}
+
+			.status-available {
+				background: #d4edda;
+				color: #155724;
+			}
+
+			.status-unavailable {
+				background: #f8d7da;
+				color: #721c24;
+			}
+
+			.status-pending {
+				background: #fff3cd;
+				color: #856404;
+			}
+
+			.status-confirmed {
+				background: #cce5ff;
+				color: #004085;
+			}
+
+			.status-checked-in {
+				background: #d1ecf1;
+				color: #0c5460;
+			}
+
+			.status-checked-out {
+				background: #d4edda;
+				color: #155724;
+			}
+
+			.status-cancelled {
+				background: #f8d7da;
+				color: #721c24;
+			}
+
+			.amenities-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 5px;
+				margin-top: 5px;
+			}
+
+			.amenity-tag {
+				background: #e9ecef;
+				padding: 3px 8px;
+				border-radius: 12px;
+				font-size: 0.8rem;
+				color: #495057;
+			}
+
+			.filters {
+				background: #f8f9fa;
+				padding: 20px;
+				border-radius: 8px;
+				margin-bottom: 20px;
+			}
+
+			.no-data {
+				text-align: center;
+				padding: 40px;
+				color: #666;
+				font-style: italic;
+			}
+
+			.loading {
+				text-align: center;
+				padding: 20px;
+				color: #667eea;
+			}
+
+			.error {
+				background: #f8d7da;
+				color: #721c24;
+				padding: 15px;
+				border-radius: 8px;
+				margin-bottom: 20px;
+				border: 1px solid #f5c6cb;
+			}
+
+			.success {
+				background: #d4edda;
+				color: #155724;
+				padding: 15px;
+				border-radius: 8px;
+				margin-bottom: 20px;
+				border: 1px solid #c3e6cb;
+			}
+
+			@media (max-width: 768px) {
+				.container {
+					padding: 10px;
+				}
+
+				.header h1 {
+					font-size: 2rem;
+				}
+
+				.tabs {
+					flex-direction: column;
+				}
+
+				.form-row {
+					grid-template-columns: 1fr;
+				}
+
+				.room-details,
+				.booking-details {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1>🏨 Hotel Booking Management</h1>
+				<p>Manage rooms and bookings with ease</p>
+			</div>
+
+			<div class="tab-container">
+				<div class="tabs">
+					<button class="tab active" onclick="switchTab('rooms')">🛏️ Rooms</button>
+					<button class="tab" onclick="switchTab('bookings')">📋 Bookings</button>
+					<button class="tab" onclick="switchTab('availability')">📅 Check Availability</button>
+					<button class="tab" onclick="switchTab('stats')">📊 Statistics</button>
+				</div>
+
+				<!-- Rooms Tab -->
+				<div id="rooms-tab" class="tab-content active">
+					<div class="card">
+						<div class="card-header">Add New Room</div>
+						<form id="add-room-form">
+							<div class="form-row">
+								<div class="form-group">
+									<label for="room-number">Room Number</label>
+									<input type="text" id="room-number" required />
+								</div>
+								<div class="form-group">
+									<label for="room-type">Room Type</label>
+									<select id="room-type" required>
+										<option value="">Select type</option>
+										<option value="single">Single</option>
+										<option value="double">Double</option>
+										<option value="suite">Suite</option>
+										<option value="deluxe">Deluxe</option>
+										<option value="presidential">Presidential</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="room-price">Price per Night ($)</label>
+									<input type="number" id="room-price" min="0" step="0.01" required />
+								</div>
+								<div class="form-group">
+									<label for="room-capacity">Capacity</label>
+									<input type="number" id="room-capacity" min="1" max="10" required />
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="room-amenities">Amenities (comma-separated)</label>
+								<input type="text" id="room-amenities" placeholder="WiFi, TV, Air Conditioning" />
+							</div>
+							<div class="form-group">
+								<label for="room-description">Description</label>
+								<textarea id="room-description" required></textarea>
+							</div>
+							<div class="form-group">
+								<label> <input type="checkbox" id="room-available" checked /> Available </label>
+							</div>
+							<button type="submit" class="btn btn-primary">Add Room</button>
+						</form>
+					</div>
+
+					<div class="card">
+						<div class="card-header">Rooms List</div>
+						<div class="filters">
+							<div class="form-row">
+								<div class="form-group">
+									<label for="filter-room-type">Filter by Type</label>
+									<select id="filter-room-type">
+										<option value="">All Types</option>
+										<option value="single">Single</option>
+										<option value="double">Double</option>
+										<option value="suite">Suite</option>
+										<option value="deluxe">Deluxe</option>
+										<option value="presidential">Presidential</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="filter-available">Availability</label>
+									<select id="filter-available">
+										<option value="">All</option>
+										<option value="true">Available Only</option>
+										<option value="false">Unavailable Only</option>
+									</select>
+								</div>
+							</div>
+							<button onclick="loadRooms()" class="btn btn-secondary">Apply Filters</button>
+						</div>
+						<div id="rooms-list"></div>
+					</div>
+				</div>
+
+				<!-- Bookings Tab -->
+				<div id="bookings-tab" class="tab-content">
+					<div class="card">
+						<div class="card-header">Create New Booking</div>
+						<form id="add-booking-form">
+							<div class="form-row">
+								<div class="form-group">
+									<label for="booking-room">Select Room</label>
+									<select id="booking-room" required>
+										<option value="">Select room</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="booking-guests">Number of Guests</label>
+									<input type="number" id="booking-guests" min="1" max="10" required />
+								</div>
+							</div>
+							<div class="form-row">
+								<div class="form-group">
+									<label for="guest-name">Guest Name</label>
+									<input type="text" id="guest-name" required />
+								</div>
+								<div class="form-group">
+									<label for="guest-email">Guest Email</label>
+									<input type="email" id="guest-email" required />
+								</div>
+							</div>
+							<div class="form-row">
+								<div class="form-group">
+									<label for="check-in">Check-in Date</label>
+									<input type="date" id="check-in" required />
+								</div>
+								<div class="form-group">
+									<label for="check-out">Check-out Date</label>
+									<input type="date" id="check-out" required />
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="special-requests">Special Requests</label>
+								<textarea id="special-requests" placeholder="Any special requests..."></textarea>
+							</div>
+							<button type="submit" class="btn btn-primary">Create Booking</button>
+						</form>
+					</div>
+
+					<div class="card">
+						<div class="card-header">Bookings List</div>
+						<div class="filters">
+							<div class="form-row">
+								<div class="form-group">
+									<label for="filter-booking-status">Filter by Status</label>
+									<select id="filter-booking-status">
+										<option value="">All Statuses</option>
+										<option value="pending">Pending</option>
+										<option value="confirmed">Confirmed</option>
+										<option value="checked_in">Checked In</option>
+										<option value="checked_out">Checked Out</option>
+										<option value="cancelled">Cancelled</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="filter-guest-name">Guest Name</label>
+									<input type="text" id="filter-guest-name" placeholder="Search by guest name" />
+								</div>
+							</div>
+							<button onclick="loadBookings()" class="btn btn-secondary">Apply Filters</button>
+						</div>
+						<div id="bookings-list"></div>
+					</div>
+				</div>
+
+				<!-- Availability Tab -->
+				<div id="availability-tab" class="tab-content">
+					<div class="card">
+						<div class="card-header">Check Room Availability</div>
+						<form id="check-availability-form">
+							<div class="form-row">
+								<div class="form-group">
+									<label for="avail-check-in">Check-in Date</label>
+									<input type="date" id="avail-check-in" required />
+								</div>
+								<div class="form-group">
+									<label for="avail-check-out">Check-out Date</label>
+									<input type="date" id="avail-check-out" required />
+								</div>
+								<div class="form-group">
+									<label for="avail-guests">Number of Guests</label>
+									<input type="number" id="avail-guests" min="1" max="10" />
+								</div>
+								<div class="form-group">
+									<label for="avail-room-type">Room Type</label>
+									<select id="avail-room-type">
+										<option value="">Any Type</option>
+										<option value="single">Single</option>
+										<option value="double">Double</option>
+										<option value="suite">Suite</option>
+										<option value="deluxe">Deluxe</option>
+										<option value="presidential">Presidential</option>
+									</select>
+								</div>
+							</div>
+							<button type="submit" class="btn btn-primary">Check Availability</button>
+						</form>
+						<div id="availability-results"></div>
+					</div>
+				</div>
+
+				<!-- Statistics Tab -->
+				<div id="stats-tab" class="tab-content">
+					<div class="card">
+						<div class="card-header">Hotel Statistics</div>
+						<div id="stats-content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const API_BASE = "http://localhost:8001";
+
+			// Tab switching
+			function switchTab(tabName) {
+				// Hide all tabs
+				document.querySelectorAll(".tab-content").forEach((tab) => {
+					tab.classList.remove("active");
+				});
+				document.querySelectorAll(".tab").forEach((tab) => {
+					tab.classList.remove("active");
+				});
+
+				// Show selected tab
+				document.getElementById(tabName + "-tab").classList.add("active");
+				event.target.classList.add("active");
+
+				// Load data for the selected tab
+				if (tabName === "rooms") {
+					loadRooms();
+					loadRoomOptions();
+				} else if (tabName === "bookings") {
+					loadBookings();
+					loadRoomOptions();
+				} else if (tabName === "stats") {
+					loadStats();
+				}
+			}
+
+			// Utility functions
+			function showMessage(message, type = "success") {
+				const messageDiv = document.createElement("div");
+				messageDiv.className = type;
+				messageDiv.textContent = message;
+
+				const container = document.querySelector(".tab-content.active .card");
+				container.insertBefore(messageDiv, container.firstChild);
+
+				setTimeout(() => {
+					messageDiv.remove();
+				}, 5000);
+			}
+
+			function formatDate(dateString) {
+				return new Date(dateString).toLocaleDateString();
+			}
+
+			function formatCurrency(amount) {
+				return new Intl.NumberFormat("en-US", {
+					style: "currency",
+					currency: "USD",
+				}).format(amount);
+			}
+
+			function getStatusBadge(status, type = "booking") {
+				if (type === "room") {
+					return status
+						? '<span class="status-badge status-available">Available</span>'
+						: '<span class="status-badge status-unavailable">Unavailable</span>';
+				}
+
+				const statusClass = `status-${status.replace("_", "-")}`;
+				return `<span class="status-badge ${statusClass}">${status.replace("_", " ")}</span>`;
+			}
+
+			// API calls
+			async function apiCall(endpoint, method = "GET", data = null) {
+				try {
+					const options = {
+						method,
+						headers: {
+							"Content-Type": "application/json",
+						},
+					};
+
+					if (data) {
+						options.body = JSON.stringify(data);
+					}
+
+					const response = await fetch(API_BASE + endpoint, options);
+					const result = await response.json();
+
+					if (!response.ok) {
+						throw new Error(result.detail || "API request failed");
+					}
+
+					return result;
+				} catch (error) {
+					console.error("API Error:", error);
+					showMessage("Error: " + error.message, "error");
+					throw error;
+				}
+			}
+
+			// Room management
+			async function loadRooms() {
+				const roomsList = document.getElementById("rooms-list");
+				roomsList.innerHTML = '<div class="loading">Loading rooms...</div>';
+
+				try {
+					const params = new URLSearchParams();
+					const roomType = document.getElementById("filter-room-type").value;
+					const available = document.getElementById("filter-available").value;
+
+					if (roomType) params.append("room_type", roomType);
+					if (available) params.append("available_only", available === "true");
+
+					const response = await apiCall("/rooms?" + params.toString());
+					const rooms = response.rooms;
+
+					if (rooms.length === 0) {
+						roomsList.innerHTML = '<div class="no-data">No rooms found</div>';
+						return;
+					}
+
+					roomsList.innerHTML = rooms
+						.map(
+							(room) => `
+                    <div class="room-card">
+                        <h4>Room ${room.room_number} - ${
+								room.room_type.charAt(0).toUpperCase() + room.room_type.slice(1)
+							}</h4>
+                        <div class="room-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Price</span>
+                                <span class="detail-value">${formatCurrency(room.price_per_night)}/night</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Capacity</span>
+                                <span class="detail-value">${room.capacity} guests</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value">${getStatusBadge(room.is_available, "room")}</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Description</span>
+                            <span class="detail-value">${room.description}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Amenities</span>
+                            <div class="amenities-list">
+                                ${room.amenities
+																	.map((amenity) => `<span class="amenity-tag">${amenity}</span>`)
+																	.join("")}
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button onclick="deleteRoom(${room.id})" class="btn btn-danger">Delete Room</button>
+                            <button onclick="toggleRoomStatus(${
+															room.id
+														}, ${!room.is_available})" class="btn btn-secondary">
+                                ${room.is_available ? "Mark Unavailable" : "Mark Available"}
+                            </button>
+                        </div>
+                    </div>
+                `
+						)
+						.join("");
+				} catch (error) {
+					roomsList.innerHTML = '<div class="error">Failed to load rooms</div>';
+				}
+			}
+
+			async function loadRoomOptions() {
+				try {
+					const response = await apiCall("/rooms?available_only=true");
+					const rooms = response.rooms;
+
+					const select = document.getElementById("booking-room");
+					select.innerHTML =
+						'<option value="">Select room</option>' +
+						rooms
+							.map(
+								(room) =>
+									`<option value="${room.id}">Room ${room.room_number} - ${room.room_type} (${formatCurrency(
+										room.price_per_night
+									)}/night, ${room.capacity} guests)</option>`
+							)
+							.join("");
+				} catch (error) {
+					console.error("Failed to load room options:", error);
+				}
+			}
+
+			async function deleteRoom(roomId) {
+				if (!confirm("Are you sure you want to delete this room? This will cancel all associated bookings.")) {
+					return;
+				}
+
+				try {
+					await apiCall(`/rooms/${roomId}`, "DELETE");
+					showMessage("Room deleted successfully");
+					loadRooms();
+					loadRoomOptions();
+				} catch (error) {
+					// Error already shown by apiCall
+				}
+			}
+
+			async function toggleRoomStatus(roomId, newStatus) {
+				try {
+					const room = await apiCall(`/rooms/${roomId}`);
+					const roomData = {
+						room_number: room.room.room_number,
+						room_type: room.room.room_type,
+						price_per_night: room.room.price_per_night,
+						capacity: room.room.capacity,
+						amenities: room.room.amenities,
+						is_available: newStatus,
+						description: room.room.description,
+					};
+
+					await apiCall(`/rooms/${roomId}`, "PUT", roomData);
+					showMessage("Room status updated successfully");
+					loadRooms();
+					loadRoomOptions();
+				} catch (error) {
+					// Error already shown by apiCall
+				}
+			}
+
+			// Booking management
+			async function loadBookings() {
+				const bookingsList = document.getElementById("bookings-list");
+				bookingsList.innerHTML = '<div class="loading">Loading bookings...</div>';
+
+				try {
+					const params = new URLSearchParams();
+					const status = document.getElementById("filter-booking-status").value;
+					const guestName = document.getElementById("filter-guest-name").value;
+
+					if (status) params.append("status_filter", status);
+					if (guestName) params.append("guest_name", guestName);
+
+					const response = await apiCall("/bookings?" + params.toString());
+					const bookings = response.bookings;
+
+					if (bookings.length === 0) {
+						bookingsList.innerHTML = '<div class="no-data">No bookings found</div>';
+						return;
+					}
+
+					bookingsList.innerHTML = bookings
+						.map(
+							(booking) => `
+                    <div class="booking-card">
+                        <h4>Booking #${booking.id} - ${booking.guest_name}</h4>
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Room</span>
+                                <span class="detail-value">Room ID: ${booking.room_id}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Guest Email</span>
+                                <span class="detail-value">${booking.guest_email}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Check-in</span>
+                                <span class="detail-value">${formatDate(booking.check_in_date)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Check-out</span>
+                                <span class="detail-value">${formatDate(booking.check_out_date)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Guests</span>
+                                <span class="detail-value">${booking.num_guests}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Price</span>
+                                <span class="detail-value">${formatCurrency(booking.total_price)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value">${getStatusBadge(booking.status)}</span>
+                            </div>
+                        </div>
+                        ${
+													booking.special_requests
+														? `
+                            <div class="detail-item">
+                                <span class="detail-label">Special Requests</span>
+                                <span class="detail-value">${booking.special_requests}</span>
+                            </div>
+                        `
+														: ""
+												}
+                        <div style="margin-top: 15px;">
+                            <button onclick="deleteBooking(${
+															booking.id
+														})" class="btn btn-danger">Cancel Booking</button>
+                            ${
+															booking.status === "pending"
+																? `
+                                <button onclick="updateBookingStatus(${booking.id}, 'confirmed')" class="btn btn-success">Confirm</button>
+                            `
+																: ""
+														}
+                            ${
+															booking.status === "confirmed"
+																? `
+                                <button onclick="updateBookingStatus(${booking.id}, 'checked_in')" class="btn btn-primary">Check In</button>
+                            `
+																: ""
+														}
+                            ${
+															booking.status === "checked_in"
+																? `
+                                <button onclick="updateBookingStatus(${booking.id}, 'checked_out')" class="btn btn-secondary">Check Out</button>
+                            `
+																: ""
+														}
+                        </div>
+                    </div>
+                `
+						)
+						.join("");
+				} catch (error) {
+					bookingsList.innerHTML = '<div class="error">Failed to load bookings</div>';
+				}
+			}
+
+			async function deleteBooking(bookingId) {
+				if (!confirm("Are you sure you want to cancel this booking?")) {
+					return;
+				}
+
+				try {
+					await apiCall(`/bookings/${bookingId}`, "DELETE");
+					showMessage("Booking cancelled successfully");
+					loadBookings();
+				} catch (error) {
+					// Error already shown by apiCall
+				}
+			}
+
+			async function updateBookingStatus(bookingId, newStatus) {
+				try {
+					await apiCall(`/bookings/${bookingId}/status?new_status=${newStatus}`, "PUT");
+					showMessage("Booking status updated successfully");
+					loadBookings();
+				} catch (error) {
+					// Error already shown by apiCall
+				}
+			}
+
+			// Availability check
+			async function checkAvailability(event) {
+				event.preventDefault();
+
+				const checkIn = document.getElementById("avail-check-in").value;
+				const checkOut = document.getElementById("avail-check-out").value;
+				const guests = document.getElementById("avail-guests").value;
+				const roomType = document.getElementById("avail-room-type").value;
+
+				const resultsDiv = document.getElementById("availability-results");
+				resultsDiv.innerHTML = '<div class="loading">Checking availability...</div>';
+
+				try {
+					const params = new URLSearchParams({
+						check_in_date: checkIn,
+						check_out_date: checkOut,
+					});
+
+					if (guests) params.append("num_guests", guests);
+					if (roomType) params.append("room_type", roomType);
+
+					const response = await apiCall("/rooms/availability?" + params.toString());
+					const rooms = response.available_rooms;
+
+					if (rooms.length === 0) {
+						resultsDiv.innerHTML = '<div class="no-data">No rooms available for the selected dates</div>';
+						return;
+					}
+
+					resultsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">Available Rooms (${rooms.length} found)</div>
+                        ${rooms
+													.map(
+														(room) => `
+                            <div class="room-card">
+                                <h4>Room ${room.room_number} - ${
+															room.room_type.charAt(0).toUpperCase() + room.room_type.slice(1)
+														}</h4>
+                                <div class="room-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Price per Night</span>
+                                        <span class="detail-value">${formatCurrency(room.price_per_night)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Total for ${room.nights} nights</span>
+                                        <span class="detail-value">${formatCurrency(room.total_price_for_stay)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Capacity</span>
+                                        <span class="detail-value">${room.capacity} guests</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Description</span>
+                                    <span class="detail-value">${room.description}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Amenities</span>
+                                    <div class="amenities-list">
+                                        ${room.amenities
+																					.map((amenity) => `<span class="amenity-tag">${amenity}</span>`)
+																					.join("")}
+                                    </div>
+                                </div>
+                            </div>
+                        `
+													)
+													.join("")}
+                    </div>
+                `;
+				} catch (error) {
+					resultsDiv.innerHTML = '<div class="error">Failed to check availability</div>';
+				}
+			}
+
+			// Statistics
+			async function loadStats() {
+				const statsContent = document.getElementById("stats-content");
+				statsContent.innerHTML = '<div class="loading">Loading statistics...</div>';
+
+				try {
+					const response = await apiCall("/stats");
+
+					statsContent.innerHTML = `
+                    <div class="form-row">
+                        <div class="card">
+                            <div class="card-header">📊 Overview</div>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Rooms</span>
+                                <span class="detail-value">${response.total_rooms}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Available Rooms</span>
+                                <span class="detail-value">${response.available_rooms}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Bookings</span>
+                                <span class="detail-value">${response.total_bookings}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Revenue</span>
+                                <span class="detail-value">${formatCurrency(response.total_revenue)}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">🛏️ Room Types</div>
+                            ${Object.entries(response.room_type_distribution)
+															.map(
+																([type, count]) => `
+                                <div class="detail-item">
+                                    <span class="detail-label">${type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                                    <span class="detail-value">${count} rooms</span>
+                                </div>
+                            `
+															)
+															.join("")}
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">📋 Booking Status</div>
+                            ${Object.entries(response.booking_status_distribution)
+															.map(
+																([status, count]) => `
+                                <div class="detail-item">
+                                    <span class="detail-label">${
+																			status.replace("_", " ").charAt(0).toUpperCase() +
+																			status.replace("_", " ").slice(1)
+																		}</span>
+                                    <span class="detail-value">${count} bookings</span>
+                                </div>
+                            `
+															)
+															.join("")}
+                        </div>
+                    </div>
+                `;
+				} catch (error) {
+					statsContent.innerHTML = '<div class="error">Failed to load statistics</div>';
+				}
+			}
+
+			// Form submissions
+			document.getElementById("add-room-form").addEventListener("submit", async function (event) {
+				event.preventDefault();
+
+				const amenities = document
+					.getElementById("room-amenities")
+					.value.split(",")
+					.map((a) => a.trim())
+					.filter((a) => a.length > 0);
+
+				const roomData = {
+					room_number: document.getElementById("room-number").value,
+					room_type: document.getElementById("room-type").value,
+					price_per_night: parseFloat(document.getElementById("room-price").value),
+					capacity: parseInt(document.getElementById("room-capacity").value),
+					amenities: amenities,
+					is_available: document.getElementById("room-available").checked,
+					description: document.getElementById("room-description").value,
+				};
+
+				try {
+					await apiCall("/rooms", "POST", roomData);
+					showMessage("Room added successfully");
+					this.reset();
+					loadRooms();
+					loadRoomOptions();
+				} catch (error) {
+					// Error already shown by apiCall
+				}
+			});
+
+			document.getElementById("add-booking-form").addEventListener("submit", async function (event) {
+				event.preventDefault();
+
+				const bookingData = {
+					room_id: parseInt(document.getElementById("booking-room").value),
+					guest_name: document.getElementById("guest-name").value,
+					guest_email: document.getElementById("guest-email").value,
+					check_in_date: document.getElementById("check-in").value,
+					check_out_date: document.getElementById("check-out").value,
+					num_guests: parseInt(document.getElementById("booking-guests").value),
+					special_requests: document.getElementById("special-requests").value || null,
+				};
+
+				try {
+					await apiCall("/bookings", "POST", bookingData);
+					showMessage("Booking created successfully");
+					this.reset();
+					loadBookings();
+				} catch (error) {
+					// Error already shown by apiCall
+				}
+			});
+
+			document.getElementById("check-availability-form").addEventListener("submit", checkAvailability);
+
+			// Set minimum dates to today
+			const today = new Date().toISOString().split("T")[0];
+			document.getElementById("check-in").min = today;
+			document.getElementById("check-out").min = today;
+			document.getElementById("avail-check-in").min = today;
+			document.getElementById("avail-check-out").min = today;
+
+			// Update check-out minimum when check-in changes
+			document.getElementById("check-in").addEventListener("change", function () {
+				const checkOut = document.getElementById("check-out");
+				checkOut.min = this.value;
+				if (checkOut.value && checkOut.value <= this.value) {
+					checkOut.value = "";
+				}
+			});
+
+			document.getElementById("avail-check-in").addEventListener("change", function () {
+				const checkOut = document.getElementById("avail-check-out");
+				checkOut.min = this.value;
+				if (checkOut.value && checkOut.value <= this.value) {
+					checkOut.value = "";
+				}
+			});
+
+			// Initialize
+			loadRooms();
+			loadRoomOptions();
+		</script>
+	</body>
+</html>
+

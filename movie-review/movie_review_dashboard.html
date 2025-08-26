@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Movie Review Dashboard</title>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				min-height: 100vh;
+				color: #333;
+			}
+
+			.container {
+				max-width: 1400px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+
+			header {
+				text-align: center;
+				margin-bottom: 30px;
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border-radius: 20px;
+				padding: 30px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			h1 {
+				color: white;
+				font-size: 2.5rem;
+				margin-bottom: 10px;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+			}
+
+			.subtitle {
+				color: rgba(255, 255, 255, 0.9);
+				font-size: 1.1rem;
+			}
+
+			.tabs {
+				display: flex;
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border-radius: 15px;
+				padding: 5px;
+				margin-bottom: 30px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				overflow-x: auto;
+			}
+
+			.tab-button {
+				flex: 1;
+				padding: 15px 20px;
+				background: transparent;
+				border: none;
+				color: rgba(255, 255, 255, 0.7);
+				cursor: pointer;
+				border-radius: 10px;
+				transition: all 0.3s ease;
+				font-size: 1rem;
+				font-weight: 500;
+				white-space: nowrap;
+			}
+
+			.tab-button:hover {
+				background: rgba(255, 255, 255, 0.1);
+				color: white;
+			}
+
+			.tab-button.active {
+				background: white;
+				color: #667eea;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.tab-content {
+				display: none;
+				animation: fadeIn 0.3s ease-in;
+			}
+
+			.tab-content.active {
+				display: block;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.card {
+				background: white;
+				border-radius: 15px;
+				padding: 25px;
+				margin-bottom: 20px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+			}
+
+			.filters {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 15px;
+				margin-bottom: 20px;
+			}
+
+			.form-group {
+				display: flex;
+				flex-direction: column;
+			}
+
+			label {
+				margin-bottom: 5px;
+				font-weight: 600;
+				color: #555;
+			}
+
+			input,
+			select,
+			textarea {
+				padding: 12px 15px;
+				border: 2px solid #e1e5e9;
+				border-radius: 10px;
+				font-size: 1rem;
+				transition: border-color 0.3s ease, box-shadow 0.3s ease;
+				background: white;
+			}
+
+			input:focus,
+			select:focus,
+			textarea:focus {
+				outline: none;
+				border-color: #667eea;
+				box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+			}
+
+			.btn {
+				padding: 12px 24px;
+				border: none;
+				border-radius: 10px;
+				cursor: pointer;
+				font-size: 1rem;
+				font-weight: 600;
+				transition: all 0.3s ease;
+				text-decoration: none;
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				justify-content: center;
+			}
+
+			.btn-primary {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+			}
+
+			.btn-primary:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+			}
+
+			.btn-secondary {
+				background: #f8f9fa;
+				color: #667eea;
+				border: 2px solid #667eea;
+			}
+
+			.btn-secondary:hover {
+				background: #667eea;
+				color: white;
+			}
+
+			.btn-danger {
+				background: #e74c3c;
+				color: white;
+			}
+
+			.btn-danger:hover {
+				background: #c0392b;
+				transform: translateY(-2px);
+			}
+
+			.btn-sm {
+				padding: 8px 16px;
+				font-size: 0.9rem;
+			}
+
+			.grid {
+				display: grid;
+				gap: 20px;
+			}
+
+			.grid-2 {
+				grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+			}
+
+			.grid-3 {
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			}
+
+			.movie-card {
+				background: white;
+				border-radius: 15px;
+				overflow: hidden;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+				transition: all 0.3s ease;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.movie-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+			}
+
+			.movie-header {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+				padding: 20px;
+				position: relative;
+			}
+
+			.movie-title {
+				font-size: 1.3rem;
+				font-weight: 700;
+				margin-bottom: 5px;
+			}
+
+			.movie-meta {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-top: 10px;
+			}
+
+			.genre-badge {
+				background: rgba(255, 255, 255, 0.2);
+				padding: 4px 12px;
+				border-radius: 20px;
+				font-size: 0.85rem;
+				font-weight: 500;
+			}
+
+			.rating {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				font-weight: 600;
+			}
+
+			.movie-body {
+				padding: 20px;
+			}
+
+			.movie-description {
+				color: #666;
+				line-height: 1.6;
+				margin-bottom: 15px;
+			}
+
+			.movie-details {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+				gap: 10px;
+				margin-bottom: 15px;
+			}
+
+			.detail-item {
+				text-align: center;
+				padding: 10px;
+				background: #f8f9fa;
+				border-radius: 8px;
+			}
+
+			.detail-label {
+				font-size: 0.8rem;
+				color: #666;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.detail-value {
+				font-size: 1.1rem;
+				font-weight: 700;
+				color: #333;
+				margin-top: 2px;
+			}
+
+			.review-card {
+				background: #f8f9fa;
+				border-radius: 10px;
+				padding: 15px;
+				margin-bottom: 15px;
+				border-left: 4px solid #667eea;
+			}
+
+			.review-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 10px;
+			}
+
+			.reviewer-name {
+				font-weight: 600;
+				color: #333;
+			}
+
+			.review-rating {
+				background: #667eea;
+				color: white;
+				padding: 4px 8px;
+				border-radius: 15px;
+				font-size: 0.9rem;
+				font-weight: 600;
+			}
+
+			.review-comment {
+				color: #666;
+				line-height: 1.5;
+				font-style: italic;
+			}
+
+			.stats-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 20px;
+				margin-bottom: 30px;
+			}
+
+			.stat-card {
+				background: white;
+				border-radius: 15px;
+				padding: 25px;
+				text-align: center;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				transition: transform 0.3s ease;
+			}
+
+			.stat-card:hover {
+				transform: translateY(-5px);
+			}
+
+			.stat-icon {
+				font-size: 2.5rem;
+				color: #667eea;
+				margin-bottom: 10px;
+			}
+
+			.stat-value {
+				font-size: 2rem;
+				font-weight: 700;
+				color: #333;
+			}
+
+			.stat-label {
+				color: #666;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				font-size: 0.9rem;
+			}
+
+			.modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.5);
+				backdrop-filter: blur(5px);
+				z-index: 1000;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.modal.active {
+				display: flex;
+			}
+
+			.modal-content {
+				background: white;
+				border-radius: 20px;
+				padding: 30px;
+				max-width: 500px;
+				width: 90%;
+				max-height: 90vh;
+				overflow-y: auto;
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+				animation: modalSlideIn 0.3s ease-out;
+			}
+
+			@keyframes modalSlideIn {
+				from {
+					opacity: 0;
+					transform: scale(0.9) translateY(-20px);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1) translateY(0);
+				}
+			}
+
+			.modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 20px;
+				padding-bottom: 15px;
+				border-bottom: 2px solid #f1f3f4;
+			}
+
+			.modal-title {
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: #333;
+			}
+
+			.close-btn {
+				background: none;
+				border: none;
+				font-size: 1.5rem;
+				cursor: pointer;
+				color: #666;
+				padding: 5px;
+				border-radius: 50%;
+				transition: all 0.3s ease;
+			}
+
+			.close-btn:hover {
+				background: #f1f3f4;
+				color: #333;
+			}
+
+			.alert {
+				padding: 15px 20px;
+				border-radius: 10px;
+				margin-bottom: 20px;
+				border: none;
+				font-weight: 500;
+			}
+
+			.alert-success {
+				background: #d4edda;
+				color: #155724;
+				border-left: 4px solid #28a745;
+			}
+
+			.alert-error {
+				background: #f8d7da;
+				color: #721c24;
+				border-left: 4px solid #dc3545;
+			}
+
+			.loading {
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.spinner {
+				width: 20px;
+				height: 20px;
+				border: 2px solid #f3f3f3;
+				border-top: 2px solid #667eea;
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.empty-state {
+				text-align: center;
+				padding: 40px 20px;
+				color: #666;
+			}
+
+			.empty-state i {
+				font-size: 4rem;
+				color: #ddd;
+				margin-bottom: 20px;
+			}
+
+			.pagination {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 10px;
+				margin-top: 30px;
+			}
+
+			.pagination button {
+				padding: 8px 12px;
+				border: 2px solid #667eea;
+				background: white;
+				color: #667eea;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+			}
+
+			.pagination button:hover:not(:disabled) {
+				background: #667eea;
+				color: white;
+			}
+
+			.pagination button:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			.pagination .page-info {
+				padding: 8px 15px;
+				background: white;
+				border-radius: 8px;
+				font-weight: 600;
+				color: #333;
+			}
+
+			@media (max-width: 768px) {
+				.container {
+					padding: 10px;
+				}
+
+				h1 {
+					font-size: 2rem;
+				}
+
+				.tabs {
+					flex-direction: column;
+				}
+
+				.filters {
+					grid-template-columns: 1fr;
+				}
+
+				.grid-2,
+				.grid-3 {
+					grid-template-columns: 1fr;
+				}
+
+				.modal-content {
+					margin: 20px;
+					padding: 20px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1><i class="fas fa-film"></i> Movie Review Dashboard</h1>
+				<p class="subtitle">Discover, review, and explore amazing movies</p>
+			</header>
+
+			<div class="tabs">
+				<button class="tab-button active" onclick="showTab('movies', event)"><i class="fas fa-film"></i> Movies</button>
+				<button class="tab-button" onclick="showTab('reviews', event)"><i class="fas fa-star"></i> Reviews</button>
+				<button class="tab-button" onclick="showTab('add-movie', event)"><i class="fas fa-plus"></i> Add Movie</button>
+				<button class="tab-button" onclick="showTab('add-review', event)"><i class="fas fa-pen"></i> Add Review</button>
+				<button class="tab-button" onclick="showTab('stats', event)">
+					<i class="fas fa-chart-bar"></i> Statistics
+				</button>
+			</div>
+
+			<!-- Movies Tab -->
+			<div id="movies" class="tab-content active">
+				<div class="card">
+					<h2><i class="fas fa-filter"></i> Filter Movies</h2>
+					<div class="filters">
+						<div class="form-group">
+							<label for="genre-filter">Genre</label>
+							<select id="genre-filter" onchange="filterMovies()">
+								<option value="">All Genres</option>
+								<option value="action">Action</option>
+								<option value="comedy">Comedy</option>
+								<option value="drama">Drama</option>
+								<option value="horror">Horror</option>
+								<option value="romance">Romance</option>
+								<option value="thriller">Thriller</option>
+								<option value="fantasy">Fantasy</option>
+								<option value="science_fiction">Science Fiction</option>
+								<option value="documentary">Documentary</option>
+								<option value="animation">Animation</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="year-filter">Release Year</label>
+							<input type="number" id="year-filter" placeholder="e.g., 2020" onchange="filterMovies()" />
+						</div>
+						<div class="form-group">
+							<label for="director-filter">Director</label>
+							<input type="text" id="director-filter" placeholder="Director name" onchange="filterMovies()" />
+						</div>
+						<div class="form-group">
+							<label for="min-rating-filter">Min Rating</label>
+							<input
+								type="number"
+								id="min-rating-filter"
+								min="0"
+								max="10"
+								step="0.1"
+								placeholder="0.0"
+								onchange="filterMovies()"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="sort-movies">Sort By</label>
+							<select id="sort-movies" onchange="filterMovies()">
+								<option value="id">ID</option>
+								<option value="title">Title</option>
+								<option value="release_year">Release Year</option>
+								<option value="rating">Rating</option>
+								<option value="duration_minutes">Duration</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="order-movies">Order</label>
+							<select id="order-movies" onchange="filterMovies()">
+								<option value="asc">Ascending</option>
+								<option value="desc">Descending</option>
+							</select>
+						</div>
+					</div>
+					<button class="btn btn-secondary" onclick="clearMovieFilters()">
+						<i class="fas fa-times"></i> Clear Filters
+					</button>
+				</div>
+
+				<div id="movies-grid" class="grid grid-3">
+					<!-- Movies will be loaded here -->
+				</div>
+
+				<div id="movies-pagination" class="pagination">
+					<!-- Pagination will be added here -->
+				</div>
+			</div>
+
+			<!-- Reviews Tab -->
+			<div id="reviews" class="tab-content">
+				<div class="card">
+					<h2><i class="fas fa-filter"></i> Filter Reviews</h2>
+					<div class="filters">
+						<div class="form-group">
+							<label for="movie-filter">Movie ID</label>
+							<input type="number" id="movie-filter" placeholder="Movie ID" onchange="filterReviews()" />
+						</div>
+						<div class="form-group">
+							<label for="reviewer-filter">Reviewer Name</label>
+							<input type="text" id="reviewer-filter" placeholder="Reviewer name" onchange="filterReviews()" />
+						</div>
+						<div class="form-group">
+							<label for="min-review-rating">Min Rating</label>
+							<input
+								type="number"
+								id="min-review-rating"
+								min="1"
+								max="10"
+								step="0.1"
+								placeholder="1.0"
+								onchange="filterReviews()"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="sort-reviews">Sort By</label>
+							<select id="sort-reviews" onchange="filterReviews()">
+								<option value="created_at">Date Created</option>
+								<option value="rating">Rating</option>
+								<option value="movie_id">Movie ID</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="order-reviews">Order</label>
+							<select id="order-reviews" onchange="filterReviews()">
+								<option value="desc">Descending</option>
+								<option value="asc">Ascending</option>
+							</select>
+						</div>
+					</div>
+					<button class="btn btn-secondary" onclick="clearReviewFilters()">
+						<i class="fas fa-times"></i> Clear Filters
+					</button>
+				</div>
+
+				<div id="reviews-container">
+					<!-- Reviews will be loaded here -->
+				</div>
+
+				<div id="reviews-pagination" class="pagination">
+					<!-- Pagination will be added here -->
+				</div>
+			</div>
+
+			<!-- Add Movie Tab -->
+			<div id="add-movie" class="tab-content">
+				<div class="card">
+					<h2><i class="fas fa-plus"></i> Add New Movie</h2>
+					<form id="movie-form">
+						<div class="grid grid-2">
+							<div class="form-group">
+								<label for="movie-title">Title *</label>
+								<input type="text" id="movie-title" required minlength="3" maxlength="200" />
+							</div>
+							<div class="form-group">
+								<label for="movie-director">Director *</label>
+								<input type="text" id="movie-director" required minlength="2" maxlength="100" />
+							</div>
+							<div class="form-group">
+								<label for="movie-genre">Genre *</label>
+								<select id="movie-genre" required>
+									<option value="">Select Genre</option>
+									<option value="action">Action</option>
+									<option value="comedy">Comedy</option>
+									<option value="drama">Drama</option>
+									<option value="horror">Horror</option>
+									<option value="romance">Romance</option>
+									<option value="thriller">Thriller</option>
+									<option value="fantasy">Fantasy</option>
+									<option value="science_fiction">Science Fiction</option>
+									<option value="documentary">Documentary</option>
+									<option value="animation">Animation</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="movie-year">Release Year *</label>
+								<input type="number" id="movie-year" required min="1888" max="2024" />
+							</div>
+							<div class="form-group">
+								<label for="movie-duration">Duration (minutes) *</label>
+								<input type="number" id="movie-duration" required min="1" max="600" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="movie-description">Description *</label>
+							<textarea
+								id="movie-description"
+								required
+								minlength="10"
+								maxlength="1000"
+								rows="4"
+								placeholder="Enter movie description..."
+							></textarea>
+						</div>
+						<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Movie</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- Add Review Tab -->
+			<div id="add-review" class="tab-content">
+				<div class="card">
+					<h2><i class="fas fa-pen"></i> Add New Review</h2>
+					<form id="review-form">
+						<div class="grid grid-2">
+							<div class="form-group">
+								<label for="review-movie-id">Movie ID *</label>
+								<input type="number" id="review-movie-id" required min="1" />
+								<small style="color: #666; margin-top: 5px; display: block">
+									Check the Movies tab to find the movie ID
+								</small>
+							</div>
+							<div class="form-group">
+								<label for="review-reviewer">Reviewer Name *</label>
+								<input type="text" id="review-reviewer" required minlength="2" maxlength="50" />
+							</div>
+							<div class="form-group">
+								<label for="review-rating">Rating (1.0 - 10.0) *</label>
+								<input type="number" id="review-rating" required min="1" max="10" step="0.1" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="review-comment">Review Comment *</label>
+							<textarea
+								id="review-comment"
+								required
+								minlength="10"
+								maxlength="500"
+								rows="4"
+								placeholder="Share your thoughts about the movie..."
+							></textarea>
+						</div>
+						<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Review</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- Statistics Tab -->
+			<div id="stats" class="tab-content">
+				<div id="stats-container">
+					<!-- Stats will be loaded here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Movie Details Modal -->
+		<div id="movie-modal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Movie Details</h3>
+					<button class="close-btn" onclick="closeModal('movie-modal')">&times;</button>
+				</div>
+				<div id="movie-modal-content">
+					<!-- Movie details will be loaded here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Edit Movie Modal -->
+		<div id="edit-movie-modal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Edit Movie</h3>
+					<button class="close-btn" onclick="closeModal('edit-movie-modal')">&times;</button>
+				</div>
+				<form id="edit-movie-form">
+					<input type="hidden" id="edit-movie-id" />
+					<div class="grid grid-2">
+						<div class="form-group">
+							<label for="edit-movie-title">Title *</label>
+							<input type="text" id="edit-movie-title" required minlength="3" maxlength="200" />
+						</div>
+						<div class="form-group">
+							<label for="edit-movie-director">Director *</label>
+							<input type="text" id="edit-movie-director" required minlength="2" maxlength="100" />
+						</div>
+						<div class="form-group">
+							<label for="edit-movie-genre">Genre *</label>
+							<select id="edit-movie-genre" required>
+								<option value="action">Action</option>
+								<option value="comedy">Comedy</option>
+								<option value="drama">Drama</option>
+								<option value="horror">Horror</option>
+								<option value="romance">Romance</option>
+								<option value="thriller">Thriller</option>
+								<option value="fantasy">Fantasy</option>
+								<option value="science_fiction">Science Fiction</option>
+								<option value="documentary">Documentary</option>
+								<option value="animation">Animation</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="edit-movie-year">Release Year *</label>
+							<input type="number" id="edit-movie-year" required min="1888" max="2024" />
+						</div>
+						<div class="form-group">
+							<label for="edit-movie-duration">Duration (minutes) *</label>
+							<input type="number" id="edit-movie-duration" required min="1" max="600" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="edit-movie-description">Description *</label>
+						<textarea id="edit-movie-description" required minlength="10" maxlength="1000" rows="4"></textarea>
+					</div>
+					<div style="display: flex; gap: 10px; justify-content: flex-end">
+						<button type="button" class="btn btn-secondary" onclick="closeModal('edit-movie-modal')">Cancel</button>
+						<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Movie</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<script>
+			const API_BASE = "http://localhost:8000";
+			let currentPage = 0;
+			const pageSize = 12;
+
+			// Tab management
+			function showTab(tabName, event = null) {
+				// Hide all tab contents
+				document.querySelectorAll(".tab-content").forEach((content) => {
+					content.classList.remove("active");
+				});
+
+				// Remove active class from all buttons
+				document.querySelectorAll(".tab-button").forEach((button) => {
+					button.classList.remove("active");
+				});
+
+				// Show selected tab content
+				document.getElementById(tabName).classList.add("active");
+
+				// Add active class to clicked button (find the button if event not available)
+				if (event && event.target) {
+					event.target.classList.add("active");
+				} else {
+					// Find the button that corresponds to this tab
+					const buttons = document.querySelectorAll(".tab-button");
+					buttons.forEach((button) => {
+						if (button.textContent.toLowerCase().includes(tabName.replace("-", " "))) {
+							button.classList.add("active");
+						}
+					});
+				}
+
+				// Load data for the selected tab
+				switch (tabName) {
+					case "movies":
+						loadMovies();
+						break;
+					case "reviews":
+						loadReviews();
+						break;
+					case "stats":
+						loadStats();
+						break;
+				}
+			}
+
+			// Utility functions
+			function showAlert(message, type = "success") {
+				const alert = document.createElement("div");
+				alert.className = `alert alert-${type}`;
+				alert.innerHTML = message;
+
+				// Insert at the top of the current tab
+				const activeTab = document.querySelector(".tab-content.active");
+				activeTab.insertBefore(alert, activeTab.firstChild);
+
+				// Remove after 5 seconds
+				setTimeout(() => {
+					alert.remove();
+				}, 5000);
+			}
+
+			function formatDate(dateString) {
+				return new Date(dateString).toLocaleDateString("en-US", {
+					year: "numeric",
+					month: "long",
+					day: "numeric",
+					hour: "2-digit",
+					minute: "2-digit",
+				});
+			}
+
+			function formatGenre(genre) {
+				return genre.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
+			}
+
+			// API calls
+			async function apiCall(endpoint, method = "GET", data = null) {
+				try {
+					const options = {
+						method,
+						headers: {
+							"Content-Type": "application/json",
+						},
+					};
+
+					if (data) {
+						options.body = JSON.stringify(data);
+					}
+
+					const response = await fetch(`${API_BASE}${endpoint}`, options);
+
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(errorData.detail || "API request failed");
+					}
+
+					return await response.json();
+				} catch (error) {
+					console.error("API Error:", error);
+					throw error;
+				}
+			}
+
+			// Movies functions
+			async function loadMovies() {
+				try {
+					const params = new URLSearchParams();
+
+					// Add filters
+					const genre = document.getElementById("genre-filter")?.value;
+					const year = document.getElementById("year-filter")?.value;
+					const director = document.getElementById("director-filter")?.value;
+					const minRating = document.getElementById("min-rating-filter")?.value;
+					const sortBy = document.getElementById("sort-movies")?.value || "id";
+					const order = document.getElementById("order-movies")?.value || "asc";
+
+					if (genre) params.append("genre", genre);
+					if (year) params.append("release_year", year);
+					if (director) params.append("director", director);
+					if (minRating) params.append("min_rating", minRating);
+					params.append("sort_by", sortBy);
+					params.append("order", order);
+					params.append("limit", pageSize);
+					params.append("offset", currentPage * pageSize);
+
+					const data = await apiCall(`/movies?${params}`);
+					displayMovies(data.movies);
+					updatePagination("movies", data.total_count, currentPage);
+				} catch (error) {
+					showAlert(`Error loading movies: ${error.message}`, "error");
+				}
+			}
+
+			function displayMovies(movies) {
+				const container = document.getElementById("movies-grid");
+
+				if (movies.length === 0) {
+					container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-film"></i>
+                        <h3>No movies found</h3>
+                        <p>Try adjusting your filters or add some movies to get started.</p>
+                    </div>
+                `;
+					return;
+				}
+
+				container.innerHTML = movies
+					.map(
+						(movie) => `
+                <div class="movie-card">
+                    <div class="movie-header">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-meta">
+                            <span class="genre-badge">${formatGenre(movie.genre)}</span>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                ${movie.rating ? movie.rating.toFixed(1) : "N/A"}
+                                <small>(${movie.review_count || 0} reviews)</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="movie-body">
+                        <p class="movie-description">${movie.description}</p>
+                        <div class="movie-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Year</div>
+                                <div class="detail-value">${movie.release_year}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Director</div>
+                                <div class="detail-value">${movie.director}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Duration</div>
+                                <div class="detail-value">${movie.duration_minutes}min</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-primary btn-sm" onclick="showMovieDetails(${movie.id})">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="editMovie(${movie.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteMovie(${movie.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
+			}
+
+			async function showMovieDetails(movieId) {
+				try {
+					const movieData = await apiCall(`/movies/${movieId}`);
+					const reviewsData = await apiCall(`/movies/${movieId}/reviews`);
+
+					const movie = movieData.movie;
+					const reviews = reviewsData.reviews;
+
+					document.getElementById("movie-modal-content").innerHTML = `
+                    <div class="movie-details">
+                        <h3>${movie.title} (${movie.release_year})</h3>
+                        <p><strong>Director:</strong> ${movie.director}</p>
+                        <p><strong>Genre:</strong> ${formatGenre(movie.genre)}</p>
+                        <p><strong>Duration:</strong> ${movie.duration_minutes} minutes</p>
+                        <p><strong>Rating:</strong> ${movie.rating ? movie.rating.toFixed(1) : "N/A"} (${
+						movie.review_count || 0
+					} reviews)</p>
+                        <p><strong>Description:</strong> ${movie.description}</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4><i class="fas fa-star"></i> Reviews (${reviews.length})</h4>
+                        ${
+													reviews.length > 0
+														? reviews
+																.map(
+																	(review) => `
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <span class="reviewer-name">${review.reviewer_name}</span>
+                                    <span class="review-rating">${review.rating}/10</span>
+                                </div>
+                                <p class="review-comment">${review.comment}</p>
+                                <small style="color: #999;">
+                                    ${formatDate(review.created_at)}
+                                </small>
+                            </div>
+                        `
+																)
+																.join("")
+														: '<p style="color: #666; text-align: center; padding: 20px;">No reviews yet.</p>'
+												}
+                    </div>
+                `;
+
+					showModal("movie-modal");
+				} catch (error) {
+					showAlert(`Error loading movie details: ${error.message}`, "error");
+				}
+			}
+
+			async function editMovie(movieId) {
+				try {
+					const data = await apiCall(`/movies/${movieId}`);
+					const movie = data.movie;
+
+					document.getElementById("edit-movie-id").value = movie.id;
+					document.getElementById("edit-movie-title").value = movie.title;
+					document.getElementById("edit-movie-director").value = movie.director;
+					document.getElementById("edit-movie-genre").value = movie.genre;
+					document.getElementById("edit-movie-year").value = movie.release_year;
+					document.getElementById("edit-movie-duration").value = movie.duration_minutes;
+					document.getElementById("edit-movie-description").value = movie.description;
+
+					showModal("edit-movie-modal");
+				} catch (error) {
+					showAlert(`Error loading movie for editing: ${error.message}`, "error");
+				}
+			}
+
+			async function deleteMovie(movieId) {
+				if (confirm("Are you sure you want to delete this movie? This will also delete all associated reviews.")) {
+					try {
+						await apiCall(`/movies/${movieId}`, "DELETE");
+						showAlert("Movie deleted successfully!");
+						loadMovies();
+					} catch (error) {
+						showAlert(`Error deleting movie: ${error.message}`, "error");
+					}
+				}
+			}
+
+			function filterMovies() {
+				currentPage = 0;
+				loadMovies();
+			}
+
+			function clearMovieFilters() {
+				document.getElementById("genre-filter").value = "";
+				document.getElementById("year-filter").value = "";
+				document.getElementById("director-filter").value = "";
+				document.getElementById("min-rating-filter").value = "";
+				document.getElementById("sort-movies").value = "id";
+				document.getElementById("order-movies").value = "asc";
+				currentPage = 0;
+				loadMovies();
+			}
+
+			// Reviews functions
+			async function loadReviews() {
+				try {
+					const params = new URLSearchParams();
+
+					const movieId = document.getElementById("movie-filter")?.value;
+					const reviewer = document.getElementById("reviewer-filter")?.value;
+					const minRating = document.getElementById("min-review-rating")?.value;
+					const sortBy = document.getElementById("sort-reviews")?.value || "created_at";
+					const order = document.getElementById("order-reviews")?.value || "desc";
+
+					if (movieId) params.append("movie_id", movieId);
+					if (reviewer) params.append("reviewer_name", reviewer);
+					if (minRating) params.append("min_rating", minRating);
+					params.append("sort_by", sortBy);
+					params.append("order", order);
+					params.append("limit", pageSize);
+					params.append("offset", currentPage * pageSize);
+
+					const data = await apiCall(`/reviews?${params}`);
+					displayReviews(data.reviews);
+					updatePagination("reviews", data.total_count, currentPage);
+				} catch (error) {
+					showAlert(`Error loading reviews: ${error.message}`, "error");
+				}
+			}
+
+			function displayReviews(reviews) {
+				const container = document.getElementById("reviews-container");
+
+				if (reviews.length === 0) {
+					container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-star"></i>
+                        <h3>No reviews found</h3>
+                        <p>Try adjusting your filters or add some reviews to get started.</p>
+                    </div>
+                `;
+					return;
+				}
+
+				container.innerHTML = `
+                <div class="card">
+                    <h2><i class="fas fa-star"></i> Reviews</h2>
+                    ${reviews
+											.map(
+												(review) => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="reviewer-name">${review.reviewer_name}</span>
+                                <span class="review-rating">${review.rating}/10</span>
+                            </div>
+                            <p class="review-comment">${review.comment}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                                <small style="color: #999;">
+                                    Movie ID: ${review.movie_id} | ${formatDate(review.created_at)}
+                                </small>
+                                <button class="btn btn-danger btn-sm" onclick="deleteReview(${review.id})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `
+											)
+											.join("")}
+                </div>
+            `;
+			}
+
+			async function deleteReview(reviewId) {
+				if (confirm("Are you sure you want to delete this review?")) {
+					try {
+						await apiCall(`/reviews/${reviewId}`, "DELETE");
+						showAlert("Review deleted successfully!");
+						loadReviews();
+					} catch (error) {
+						showAlert(`Error deleting review: ${error.message}`, "error");
+					}
+				}
+			}
+
+			function filterReviews() {
+				currentPage = 0;
+				loadReviews();
+			}
+
+			function clearReviewFilters() {
+				document.getElementById("movie-filter").value = "";
+				document.getElementById("reviewer-filter").value = "";
+				document.getElementById("min-review-rating").value = "";
+				document.getElementById("sort-reviews").value = "created_at";
+				document.getElementById("order-reviews").value = "desc";
+				currentPage = 0;
+				loadReviews();
+			}
+
+			// Statistics functions
+			async function loadStats() {
+				try {
+					const data = await apiCall("/stats");
+					displayStats(data);
+				} catch (error) {
+					showAlert(`Error loading statistics: ${error.message}`, "error");
+				}
+			}
+
+			function displayStats(stats) {
+				const container = document.getElementById("stats-container");
+
+				container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-film"></i></div>
+                        <div class="stat-value">${stats.total_movies}</div>
+                        <div class="stat-label">Total Movies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-value">${stats.total_reviews}</div>
+                        <div class="stat-label">Total Reviews</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-value">${
+													stats.average_rating_overall ? stats.average_rating_overall.toFixed(1) : "N/A"
+												}</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3><i class="fas fa-chart-pie"></i> Movies by Genre</h3>
+                        ${
+													Object.keys(stats.genre_distribution).length > 0
+														? Object.entries(stats.genre_distribution)
+																.map(
+																	([genre, count]) => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f3f4;">
+                                    <span>${formatGenre(genre)}</span>
+                                    <span style="font-weight: 600; color: #667eea;">${count}</span>
+                                </div>
+                            `
+																)
+																.join("")
+														: '<p style="color: #666; text-align: center; padding: 20px;">No genre data available.</p>'
+												}
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-trophy"></i> Most Reviewed Movies</h3>
+                        ${
+													Object.keys(stats.movies_by_review_count).length > 0
+														? Object.entries(stats.movies_by_review_count)
+																.slice(0, 5)
+																.map(
+																	([movieId, count]) => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f3f4;">
+                                    <span>Movie ID: ${movieId}</span>
+                                    <span style="font-weight: 600; color: #667eea;">${count} reviews</span>
+                                </div>
+                            `
+																)
+																.join("")
+														: '<p style="color: #666; text-align: center; padding: 20px;">No review data available.</p>'
+												}
+                    </div>
+                </div>
+            `;
+			}
+
+			// Form handlers
+			document.getElementById("movie-form").addEventListener("submit", async function (e) {
+				e.preventDefault();
+
+				const movieData = {
+					title: document.getElementById("movie-title").value,
+					description: document.getElementById("movie-description").value,
+					genre: document.getElementById("movie-genre").value,
+					release_year: parseInt(document.getElementById("movie-year").value),
+					director: document.getElementById("movie-director").value,
+					duration_minutes: parseInt(document.getElementById("movie-duration").value),
+				};
+
+				try {
+					await apiCall("/movies?auto_id=true", "POST", movieData);
+					showAlert("Movie added successfully!");
+					this.reset();
+					showTab("movies");
+				} catch (error) {
+					showAlert(`Error adding movie: ${error.message}`, "error");
+				}
+			});
+
+			document.getElementById("edit-movie-form").addEventListener("submit", async function (e) {
+				e.preventDefault();
+
+				const movieId = document.getElementById("edit-movie-id").value;
+				const movieData = {
+					title: document.getElementById("edit-movie-title").value,
+					description: document.getElementById("edit-movie-description").value,
+					genre: document.getElementById("edit-movie-genre").value,
+					release_year: parseInt(document.getElementById("edit-movie-year").value),
+					director: document.getElementById("edit-movie-director").value,
+					duration_minutes: parseInt(document.getElementById("edit-movie-duration").value),
+				};
+
+				try {
+					await apiCall(`/movies/${movieId}`, "PUT", movieData);
+					showAlert("Movie updated successfully!");
+					closeModal("edit-movie-modal");
+					loadMovies();
+				} catch (error) {
+					showAlert(`Error updating movie: ${error.message}`, "error");
+				}
+			});
+
+			document.getElementById("review-form").addEventListener("submit", async function (e) {
+				e.preventDefault();
+
+				const reviewData = {
+					movie_id: parseInt(document.getElementById("review-movie-id").value),
+					reviewer_name: document.getElementById("review-reviewer").value,
+					rating: parseFloat(document.getElementById("review-rating").value),
+					comment: document.getElementById("review-comment").value,
+				};
+
+				try {
+					await apiCall("/reviews?auto_id=true", "POST", reviewData);
+					showAlert("Review added successfully!");
+					this.reset();
+					showTab("reviews");
+				} catch (error) {
+					showAlert(`Error adding review: ${error.message}`, "error");
+				}
+			});
+
+			// Modal functions
+			function showModal(modalId) {
+				document.getElementById(modalId).classList.add("active");
+			}
+
+			function closeModal(modalId) {
+				document.getElementById(modalId).classList.remove("active");
+			}
+
+			// Pagination
+			function updatePagination(type, totalCount, currentPageIndex) {
+				const container = document.getElementById(`${type}-pagination`);
+				const totalPages = Math.ceil(totalCount / pageSize);
+
+				if (totalPages <= 1) {
+					container.innerHTML = "";
+					return;
+				}
+
+				container.innerHTML = `
+                <button onclick="changePage(${currentPageIndex - 1}, '${type}')" ${
+					currentPageIndex === 0 ? "disabled" : ""
+				}>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div class="page-info">
+                    Page ${currentPageIndex + 1} of ${totalPages}
+                </div>
+                <button onclick="changePage(${currentPageIndex + 1}, '${type}')" ${
+					currentPageIndex >= totalPages - 1 ? "disabled" : ""
+				}>
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+			}
+
+			function changePage(newPage, type) {
+				if (newPage < 0) return;
+				currentPage = newPage;
+
+				if (type === "movies") {
+					loadMovies();
+				} else if (type === "reviews") {
+					loadReviews();
+				}
+			}
+
+			// Close modals when clicking outside
+			document.addEventListener("click", function (e) {
+				if (e.target.classList.contains("modal")) {
+					e.target.classList.remove("active");
+				}
+			});
+
+			// Initialize the dashboard
+			document.addEventListener("DOMContentLoaded", function () {
+				loadMovies();
+			});
+		</script>
+	</body>
+</html>

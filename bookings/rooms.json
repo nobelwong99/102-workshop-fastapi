@@ -1,0 +1,84 @@
+[
+    {
+        "id": 1,
+        "room_number": "101",
+        "room_type": "single",
+        "price_per_night": 120.0,
+        "capacity": 1,
+        "amenities": [
+            "WiFi",
+            "TV",
+            "Air Conditioning"
+        ],
+        "is_available": true,
+        "description": "Cozy single room with city view, perfect for business travelers."
+    },
+    {
+        "id": 2,
+        "room_number": "205",
+        "room_type": "double",
+        "price_per_night": 180.0,
+        "capacity": 2,
+        "amenities": [
+            "WiFi",
+            "TV",
+            "Air Conditioning",
+            "Mini Bar",
+            "Room Service"
+        ],
+        "is_available": true,
+        "description": "Spacious double room with queen bed and modern amenities."
+    },
+    {
+        "id": 3,
+        "room_number": "301",
+        "room_type": "suite",
+        "price_per_night": 350.0,
+        "capacity": 4,
+        "amenities": [
+            "WiFi",
+            "TV",
+            "Air Conditioning",
+            "Mini Bar",
+            "Room Service",
+            "Jacuzzi",
+            "Balcony"
+        ],
+        "is_available": true,
+        "description": "Luxurious suite with separate living area, jacuzzi, and panoramic city views."
+    },
+    {
+        "id": 4,
+        "room_number": "102",
+        "room_type": "single",
+        "price_per_night": 110.0,
+        "capacity": 1,
+        "amenities": [
+            "WiFi",
+            "TV",
+            "Air Conditioning"
+        ],
+        "is_available": false,
+        "description": "Standard single room currently under maintenance."
+    },
+    {
+        "id": 5,
+        "room_number": "450",
+        "room_type": "presidential",
+        "price_per_night": 800.0,
+        "capacity": 6,
+        "amenities": [
+            "WiFi",
+            "TV",
+            "Air Conditioning",
+            "Mini Bar",
+            "Room Service",
+            "Jacuzzi",
+            "Balcony",
+            "Butler Service",
+            "Kitchen"
+        ],
+        "is_available": true,
+        "description": "Presidential suite with premium amenities, private balcony, and dedicated butler service."
+    }
+]

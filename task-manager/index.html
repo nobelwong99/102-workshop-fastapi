@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Task Manager UI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			body {
+				font-family: system-ui, sans-serif;
+				background: #f5f6fa;
+				margin: 0;
+				padding: 20px;
+				color: #333;
+			}
+			h1 {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			.container {
+				max-width: 800px;
+				margin: auto;
+				background: #fff;
+				padding: 20px;
+				border-radius: 12px;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+			}
+			form {
+				display: grid;
+				gap: 10px;
+				margin-bottom: 20px;
+			}
+			input,
+			textarea,
+			button {
+				padding: 10px;
+				border-radius: 8px;
+				border: 1px solid #ccc;
+				font-size: 1rem;
+			}
+			button {
+				background: #007bff;
+				color: white;
+				border: none;
+				cursor: pointer;
+				transition: background 0.2s;
+			}
+			button:hover {
+				background: #0056b3;
+			}
+			ul {
+				list-style: none;
+				padding: 0;
+			}
+			.task {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				background: #f9f9f9;
+				margin-bottom: 10px;
+				padding: 10px 15px;
+				border-radius: 8px;
+			}
+			.task.completed {
+				text-decoration: line-through;
+				color: gray;
+				background: #e0e0e0;
+			}
+			.actions button {
+				margin-left: 5px;
+				padding: 6px 10px;
+				font-size: 0.9rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Task Manager</h1>
+
+			<form id="taskForm">
+				<input type="number" id="taskId" placeholder="Task ID (leave empty if auto)" />
+				<input type="text" id="taskTitle" placeholder="Task Title" required />
+				<textarea id="taskDesc" placeholder="Task Description" required></textarea>
+				<button type="submit">Add Task</button>
+			</form>
+
+			<h2>Tasks</h2>
+			<ul id="taskList"></ul>
+		</div>
+
+		<script>
+			const API_BASE = "http://localhost:8000";
+
+			const taskForm = document.getElementById("taskForm");
+			const taskList = document.getElementById("taskList");
+
+			// Fetch and display tasks
+			async function loadTasks() {
+				const res = await fetch(`${API_BASE}/tasks`);
+				const tasks = await res.json();
+				taskList.innerHTML = "";
+				tasks.forEach((task) => {
+					const li = document.createElement("li");
+					li.className = "task" + (task.completed ? " completed" : "");
+					li.innerHTML = `
+          <div>
+            <strong>${task.title}</strong><br/>
+            <small>${task.description}</small>
+          </div>
+          <div class="actions">
+            <button onclick="toggleComplete(${task.id}, ${!task.completed})">
+              ${task.completed ? "Undo" : "Complete"}
+            </button>
+            <button onclick="deleteTask(${task.id})" style="background:#dc3545">Delete</button>
+          </div>
+        `;
+					taskList.appendChild(li);
+				});
+			}
+
+			// Add task
+			taskForm.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				const id = document.getElementById("taskId").value || null;
+				const title = document.getElementById("taskTitle").value;
+				const description = document.getElementById("taskDesc").value;
+
+				const task = { id: id ? parseInt(id) : 0, title, description, completed: false };
+				const query = id ? "" : "?auto_id=true"; // auto-generate ID if not provided
+
+				await fetch(`${API_BASE}/tasks${query}`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(task),
+				});
+
+				taskForm.reset();
+				loadTasks();
+			});
+
+			// Toggle task completion
+			async function toggleComplete(id, completed) {
+				const res = await fetch(`${API_BASE}/tasks/${id}`);
+				const task = await res.json();
+				task.completed = completed;
+
+				await fetch(`${API_BASE}/tasks/${id}`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(task),
+				});
+
+				loadTasks();
+			}
+
+			// Delete task
+			async function deleteTask(id) {
+				await fetch(`${API_BASE}/tasks/${id}`, { method: "DELETE" });
+				loadTasks();
+			}
+
+			// Initial load
+			loadTasks();
+		</script>
+	</body>
+</html>
