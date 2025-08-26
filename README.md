@@ -31,7 +31,23 @@ A comprehensive movie and review management system with advanced filtering and v
 - 🎯 Automatic rating calculations
 - 📱 Web dashboard interface
 
-### 3. Template Project (`/template/`)
+### 3. Hotel Booking API (`/bookings/`)
+
+A comprehensive hotel management system for rooms and bookings with advanced features.
+
+**Features:**
+
+- 🏨 Complete hotel room management (CRUD operations)
+- 📅 Booking system with date validation and availability checking
+- 🔍 Advanced filtering and sorting for rooms and bookings
+- 💰 Automatic price calculation and revenue tracking
+- 📊 Hotel statistics and analytics dashboard
+- 🏷️ Room type categorization (Single, Double, Suite, Deluxe, Presidential)
+- ✅ Booking status management (Pending, Confirmed, Checked-in, Checked-out, Cancelled)
+- 📱 Beautiful web interface for hotel management
+- 🛡️ Comprehensive validation and error handling
+
+### 4. Template Project (`/template/`)
 
 A minimal FastAPI starter template for new projects.
 
@@ -98,6 +114,19 @@ The Movie Review API will be available at `http://localhost:8000`
 - **ReDoc**: `http://localhost:8000/redoc`
 - **Web Dashboard**: `movie_review_dashboard.html` (open in browser)
 
+### Hotel Booking API
+
+```bash
+cd bookings
+fastapi dev main.py
+```
+
+The Hotel Booking API will be available at `http://localhost:8000`
+
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+- **Web Interface**: `index.html` (open in browser)
+
 ### Template Project
 
 ```bash
@@ -116,7 +145,7 @@ Each project includes interactive API documentation accessible once the server i
 
 ## Task Manager API Endpoints
 
-#### Base URL: `http://localhost:8000` (when running task-manager)
+**Base URL:** `http://localhost:8000` (when running task-manager)
 
 | Method | Endpoint           | Description          | Request Body |
 | ------ | ------------------ | -------------------- | ------------ |
@@ -140,7 +169,7 @@ Each project includes interactive API documentation accessible once the server i
 
 ## Movie Review API Endpoints
 
-#### Base URL: `http://localhost:8000` (when running movie-review)
+**Base URL:** `http://localhost:8000` (when running movie-review)
 
 ### Movies
 
@@ -169,9 +198,42 @@ Each project includes interactive API documentation accessible once the server i
 | GET    | `/movies/{id}/reviews` | Get all reviews for movie |
 | GET    | `/stats`               | Get system statistics     |
 
+## Hotel Booking API Endpoints
+
+**Base URL:** `http://localhost:8000` (when running bookings)
+
+### Rooms
+
+| Method | Endpoint      | Description              | Request Body |
+| ------ | ------------- | ------------------------ | ------------ |
+| GET    | `/rooms`      | Get all rooms (filtered) | None         |
+| GET    | `/rooms/{id}` | Get specific room        | None         |
+| POST   | `/rooms`      | Create new room          | Room object  |
+| PUT    | `/rooms/{id}` | Update existing room     | Room object  |
+| DELETE | `/rooms/{id}` | Delete room              | None         |
+
+### Bookings
+
+| Method | Endpoint         | Description             | Request Body   |
+| ------ | ---------------- | ----------------------- | -------------- |
+| GET    | `/bookings`      | Get all bookings        | None           |
+| GET    | `/bookings/{id}` | Get specific booking    | None           |
+| POST   | `/bookings`      | Create new booking      | Booking object |
+| PUT    | `/bookings/{id}` | Update existing booking | Booking object |
+| DELETE | `/bookings/{id}` | Delete booking          | None           |
+
+### Additional Hotel Endpoints
+
+| Method | Endpoint                | Description               |
+| ------ | ----------------------- | ------------------------- |
+| PUT    | `/bookings/{id}/status` | Update booking status     |
+| GET    | `/rooms/{id}/bookings`  | Get all bookings for room |
+| GET    | `/rooms/availability`   | Check room availability   |
+| GET    | `/stats`                | Get hotel statistics      |
+
 ## Example Requests
 
-### Task Manager API
+### Task Manager API Examples
 
 #### Create a Task
 
@@ -198,7 +260,7 @@ curl -X GET "http://localhost:8000/tasks"
 curl -X GET "http://localhost:8000/tasks?completed=true"
 ```
 
-### Movie Review API
+### Movie Review API Examples
 
 #### Create a Movie
 
@@ -234,6 +296,52 @@ curl -X POST "http://localhost:8000/reviews" \
      }'
 ```
 
+### Hotel Booking API Examples
+
+#### Create a Room
+
+```bash
+curl -X POST "http://localhost:8000/rooms" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "room_number": "201",
+       "room_type": "double",
+       "price_per_night": 200.0,
+       "capacity": 2,
+       "amenities": ["WiFi", "TV", "Air Conditioning", "Mini Bar"],
+       "is_available": true,
+       "description": "Comfortable double room with modern amenities"
+     }'
+```
+
+#### Create a Booking
+
+```bash
+curl -X POST "http://localhost:8000/bookings" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "room_id": 1,
+       "guest_name": "Alice Johnson",
+       "guest_email": "alice@email.com",
+       "check_in_date": "2025-02-01",
+       "check_out_date": "2025-02-05",
+       "num_guests": 2,
+       "special_requests": "Late check-in preferred"
+     }'
+```
+
+#### Check Room Availability
+
+```bash
+curl -X GET "http://localhost:8000/rooms/availability?check_in_date=2025-02-10&check_out_date=2025-02-15&num_guests=2&room_type=suite"
+```
+
+#### Get Hotel Statistics
+
+```bash
+curl -X GET "http://localhost:8000/stats"
+```
+
 ## Development
 
 ### Running in Development Mode
@@ -252,7 +360,7 @@ fastapi dev filename.py
 
 ### Project Structure
 
-```
+```text
 102-workshop-fastapi/
 ├── task-manager/
 │   ├── main.py              # Task management API
@@ -265,6 +373,11 @@ fastapi dev filename.py
 │   ├── reviews.json              # Review data storage
 │   ├── movie_review_dashboard.html # Web dashboard
 │   └── test_movie_api.py         # API tests
+├── bookings/
+│   ├── main.py              # Hotel booking API
+│   ├── rooms.json           # Room data storage
+│   ├── bookings.json        # Booking data storage
+│   └── index.html           # Hotel management interface
 ├── template/
 │   ├── api.py               # Basic FastAPI template
 │   └── db.json              # Template data file
@@ -289,6 +402,7 @@ Each project includes test files:
 
 - `test_api.py` (Task Manager)
 - `test_movie_api.py` (Movie Review)
+- Test files for the Hotel Booking API can be created following the same patterns
 
 Run tests using:
 
@@ -313,6 +427,15 @@ pytest test_api.py -v
 - Statistics and analytics
 - Web dashboard interface
 - Real-time rating updates
+
+### Hotel Booking System
+
+- Complete hotel room and booking management
+- Advanced availability checking and date validation
+- Price calculation and revenue tracking
+- Multiple room types and booking statuses
+- Statistical reporting and analytics
+- Professional web interface for hotel staff
 
 ### Template
 
@@ -350,6 +473,7 @@ Workshop Date: 2025-08-21
 1. **Start with Template** (`/template/`) - Basic FastAPI setup
 2. **Build Task Manager** (`/task-manager/`) - CRUD operations and filtering
 3. **Explore Movie Review** (`/movie-review/`) - Advanced features and validation
+4. **Master Hotel Booking** (`/bookings/`) - Complex business logic and data relationships
 
 ## Support
 
